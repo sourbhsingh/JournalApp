@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import practice.app.journalapp.entity.JournalEntry;
+import practice.app.journalapp.entity.User;
 import practice.app.journalapp.service.JournalEntryService;
+import practice.app.journalapp.service.UserService;
 
 import java.util.List;
 
@@ -16,9 +18,19 @@ public class JournalEntryController {
     @Autowired
     private JournalEntryService journalEntryService ;
 
+    @Autowired
+    private UserService userService;
     @GetMapping
     public ResponseEntity<List<JournalEntry>> getAll(){
         List<JournalEntry> e =journalEntryService.getAll();
+        if(e.isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(e);
+    }
+    @GetMapping("/{username}")
+    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser(@PathVariable String username){
+        User user = userService.findByUsername(username);
+
+        List<JournalEntry> e = user.getJournalEntries();
         if(e.isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         return ResponseEntity.ok(e);
     }
