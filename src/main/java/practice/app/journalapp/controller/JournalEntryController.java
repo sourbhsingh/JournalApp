@@ -1,6 +1,9 @@
 package practice.app.journalapp.controller;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import practice.app.journalapp.entity.JournalEntry;
 import practice.app.journalapp.service.JournalEntryService;
@@ -14,14 +17,35 @@ public class JournalEntryController {
     private JournalEntryService journalEntryService ;
 
     @GetMapping
-    public List<JournalEntry> getAll(){
-        return journalEntryService.getAll();
+    public ResponseEntity<List<JournalEntry>> getAll(){
+        List<JournalEntry> e =journalEntryService.getAll();
+        if(e.isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(e);
     }
 
     @PostMapping
-    public Boolean createEntry(@RequestBody JournalEntry journalEntry){
+    public JournalEntry createEntry(@RequestBody JournalEntry journalEntry){
          journalEntryService.saveEntry(journalEntry);
-         return true ;
+         return journalEntry ;
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId id){
+       JournalEntry je =  journalEntryService.findById(id);
+       if(je==null) return ResponseEntity.notFound().build();
+       return ResponseEntity.ok(je);
+    }
+
+    @DeleteMapping("/id/{id}")
+    public void deleteEntryById(@PathVariable ObjectId id){
+        journalEntryService.deleteById(id);
+        ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/id/{id}")
+    public ResponseEntity<JournalEntry> updateEntry(@PathVariable ObjectId id , @RequestBody JournalEntry updateEntry){
+        JournalEntry js = journalEntryService.updateEntry(id,updateEntry);
+        if(js==null) return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
