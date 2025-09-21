@@ -4,11 +4,10 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import practice.app.journalapp.entity.JournalEntry;
+import practice.app.journalapp.entity.User;
 import practice.app.journalapp.repository.JournalEntryRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -16,10 +15,16 @@ public class JournalEntryService {
     @Autowired
     private JournalEntryRepository journalEntryRepository;
 
-public void saveEntry(JournalEntry journalEntry)
+    @Autowired
+    private UserService userService;
+public void saveEntry(JournalEntry journalEntry, String username)
 {
+    User user = userService.findByUsername(username);
     journalEntry.setDate(LocalDateTime.now());
-    journalEntryRepository.save(journalEntry);
+    JournalEntry saved =journalEntryRepository.save(journalEntry);
+    user.getJournalEntries().add(saved);
+    userService.saveEntry(user);
+
 }
 
 public List<JournalEntry> getAll(){

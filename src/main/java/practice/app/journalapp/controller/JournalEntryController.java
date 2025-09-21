@@ -20,6 +20,7 @@ public class JournalEntryController {
 
     @Autowired
     private UserService userService;
+
     @GetMapping
     public ResponseEntity<List<JournalEntry>> getAll(){
         List<JournalEntry> e =journalEntryService.getAll();
@@ -29,16 +30,15 @@ public class JournalEntryController {
     @GetMapping("/{username}")
     public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser(@PathVariable String username){
         User user = userService.findByUsername(username);
-
         List<JournalEntry> e = user.getJournalEntries();
         if(e.isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         return ResponseEntity.ok(e);
     }
 
-    @PostMapping
-    public JournalEntry createEntry(@RequestBody JournalEntry journalEntry){
-         journalEntryService.saveEntry(journalEntry);
-         return journalEntry ;
+    @PostMapping("/{username}")
+    public JournalEntry createEntry(@PathVariable String username,@RequestBody JournalEntry journalEntry){
+        journalEntryService.saveEntry(journalEntry , username);
+        return journalEntry ;
     }
 
     @GetMapping("/id/{id}")
