@@ -3,6 +3,7 @@ package practice.app.journalapp.service;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import practice.app.journalapp.entity.JournalEntry;
 import practice.app.journalapp.entity.User;
 import practice.app.journalapp.repository.JournalEntryRepository;
@@ -17,6 +18,8 @@ public class JournalEntryService {
 
     @Autowired
     private UserService userService;
+
+    @Transactional
 public void saveEntry(JournalEntry journalEntry, String username)
 {
     User user = userService.findByUsername(username);
@@ -35,6 +38,7 @@ public List<JournalEntry> getAll(){
     return journalEntryRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public void deleteById(ObjectId id, String username) {
      User user = userService.findByUsername(username);
      user.getJournalEntries().removeIf(n->n.getId().equals(id));
@@ -42,6 +46,7 @@ public List<JournalEntry> getAll(){
      journalEntryRepository.deleteById(id);
     }
 
+    @Transactional
     public JournalEntry updateEntry(ObjectId id, JournalEntry updateEntry) {
       JournalEntry oldEntry= journalEntryRepository.findById(id).orElse(null);
       if(oldEntry!=null){
