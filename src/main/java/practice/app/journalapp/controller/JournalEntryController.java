@@ -48,9 +48,9 @@ public class JournalEntryController {
        return ResponseEntity.ok(je);
     }
 
-    @DeleteMapping("/id/{id}")
-    public void deleteEntryById(@PathVariable ObjectId id){
-        journalEntryService.deleteById(id);
+    @DeleteMapping("/id/{id}/{username}")
+    public void deleteEntryById(@PathVariable ObjectId id , @PathVariable String username){
+        journalEntryService.deleteById(id,username);
         ResponseEntity.status(HttpStatus.OK).build();
     }
 
