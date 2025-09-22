@@ -54,10 +54,10 @@ public class JournalEntryController {
         ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/id/{id}")
+    @PutMapping("/id/{id}/{username}")
     public ResponseEntity<JournalEntry> updateEntry(@PathVariable ObjectId id , @RequestBody JournalEntry updateEntry){
         JournalEntry js = journalEntryService.updateEntry(id,updateEntry);
         if(js==null) return ResponseEntity.notFound().build();
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(js);
     }
 }
