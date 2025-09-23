@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
+@EnableTransactionManagement
 public class JournalAppApplication {
 
     public static void main(String[] args) {
@@ -15,7 +17,7 @@ public class JournalAppApplication {
     }
 
     @Bean
-    public PlatformTransactionManager add(MongoDatabaseFactory dbFactory){
+    public PlatformTransactionManager falana(MongoDatabaseFactory dbFactory){
         return new MongoTransactionManager(dbFactory);
     }
 }
