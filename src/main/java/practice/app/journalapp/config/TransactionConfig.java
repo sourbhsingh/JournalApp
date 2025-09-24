@@ -8,10 +8,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EnableTransactionManagement
+
 public class TransactionConfig {
-    @Bean
-    public PlatformTransactionManager falana(MongoDatabaseFactory dbFactory){
-        return new MongoTransactionManager(dbFactory);
-    }
+
 }
