@@ -12,6 +12,7 @@ import practice.app.journalapp.service.JournalEntryService;
 import practice.app.journalapp.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/journal")
@@ -47,21 +48,33 @@ public class JournalEntryController {
 
     @GetMapping("/id/{id}")
     public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId id){
-       JournalEntry je =  journalEntryService.findById(id);
-       if(je==null) return ResponseEntity.notFound().build();
-       return ResponseEntity.ok(je);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(id)).toList();
+        if(!collect.isEmpty()) {
+            JournalEntry je = journalEntryService.findById(id);
+            return ResponseEntity.ok(je);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/id/{id}/{username}")
-    public void deleteEntryById(@PathVariable ObjectId id , @PathVariable String username){
+    @DeleteMapping("/id/{id}}")
+    public void deleteEntryById(@PathVariable ObjectId id){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         journalEntryService.deleteById(id,username);
         ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/id/{id}/{username}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<JournalEntry> updateEntry(@PathVariable ObjectId id , @RequestBody JournalEntry updateEntry){
-        JournalEntry js = journalEntryService.updateEntry(id,updateEntry);
-        if(js==null) return ResponseEntity.notFound().build();
-        return ResponseEntity.status(HttpStatus.OK).body(js);
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(username);
+        List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(id)).toList();
+        if(!collect.isEmpty()) {
+            JournalEntry je = journalEntryService.updateEntry(id,updateEntry);
+            return ResponseEntity.ok(je);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
