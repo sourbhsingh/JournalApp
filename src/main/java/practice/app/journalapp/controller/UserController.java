@@ -22,7 +22,7 @@ public class UserController {
     @PutMapping()
     public ResponseEntity<User> updateUser(@RequestBody User user){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User js = userService.updatePassword(user);
+        User js = userService.updateUser(user,username);
         if(js==null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(js);
     }
