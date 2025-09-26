@@ -12,7 +12,7 @@ import practice.app.journalapp.service.JournalEntryService;
 import practice.app.journalapp.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/journal")
