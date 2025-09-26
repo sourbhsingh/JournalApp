@@ -24,7 +24,7 @@ public class UserService {
 public void saveEntry(User user)
 {
     user.setPassword(passwordEncoder.encode(user.getPassword()));
-    user.setRole(Arrays.asList("User"));
+    user.setRole(Arrays.asList("USER"));
     userRepository.save(user);
 }
 
@@ -40,27 +40,31 @@ public List<User> getAll(){
      userRepository.deleteById(id);
     }
 
-    public User updatePassword( User user) {
-      User old= userRepository.findByUsername(user.getUsername());
-      if(old!=null){
-          old.setPassword(user.getPassword());
-          userRepository.save(old);
-      }
+    public User updatePassword(User user) {
+        User old = userRepository.findByUsername(user.getUsername());
+        if (old != null) {
+            old.setPassword(passwordEncoder.encode(user.getPassword())); //  encode!
+            userRepository.save(old);
+        }
         return old;
     }
+
+    public User updateUser(User user, String username) {
+        User old = userRepository.findByUsername(username);
+        if (old != null) {
+            old.setUsername(user.getUsername());
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                old.setPassword(passwordEncoder.encode(user.getPassword())); //  encode
+            }
+            userRepository.save(old);
+        }
+        return old;
+    }
+
 
     public User findByUsername(String username) {
     return userRepository.findByUsername(username);
 
     }
 
-    public User updateUser(User user, String username) {
-        User old= userRepository.findByUsername(username);
-        if(old!=null){
-            old.setUsername(user.getUsername());
-            old.setPassword(user.getPassword());
-            userRepository.save(old);
-        }
-        return old;
-    }
 }

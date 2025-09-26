@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import practice.app.journalapp.entity.JournalEntry;
 import practice.app.journalapp.entity.User;
 import practice.app.journalapp.repository.JournalEntryRepository;
+import practice.app.journalapp.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,16 +18,16 @@ public class JournalEntryService {
     private JournalEntryRepository journalEntryRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Transactional
 public void saveEntry(JournalEntry journalEntry, String username)
 {
-    User user = userService.findByUsername(username);
+    User user = userRepository.findByUsername(username);
     journalEntry.setDate(LocalDateTime.now());
     JournalEntry saved =journalEntryRepository.save(journalEntry);
     user.getJournalEntries().add(saved);
-    userService.saveEntry(user);
+    userRepository.save(user);
 
 }
 
@@ -40,9 +41,9 @@ public List<JournalEntry> getAll(){
 
     @Transactional
     public void deleteById(ObjectId id, String username) {
-     User user = userService.findByUsername(username);
+     User user = userRepository.findByUsername(username);
      user.getJournalEntries().removeIf(n->n.getId().equals(id));
-     userService.saveEntry(user);
+     userRepository.save(user);
      journalEntryRepository.deleteById(id);
     }
 
