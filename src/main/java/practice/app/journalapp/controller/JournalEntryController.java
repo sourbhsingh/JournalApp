@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import practice.app.journalapp.entity.JournalEntry;
 import practice.app.journalapp.entity.User;
@@ -21,23 +22,25 @@ public class JournalEntryController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    @GetMapping("get-all")
     public ResponseEntity<List<JournalEntry>> getAll(){
         List<JournalEntry> e =journalEntryService.getAll();
         if(e.isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         return ResponseEntity.ok(e);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser(@PathVariable String username){
+    @GetMapping()
+    public ResponseEntity<List<JournalEntry>> getAllJournalEntriesOfUser(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
         List<JournalEntry> e = user.getJournalEntries();
         if(e.isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         return ResponseEntity.ok(e);
     }
 
-    @PostMapping("/{username}")
-    public JournalEntry createEntry(@PathVariable String username,@RequestBody JournalEntry journalEntry){
+    @PostMapping()
+    public JournalEntry createEntry(@RequestBody JournalEntry journalEntry){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         journalEntryService.saveEntry(journalEntry , username);
         return journalEntry ;
     }

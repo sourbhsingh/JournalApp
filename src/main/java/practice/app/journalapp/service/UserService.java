@@ -53,4 +53,14 @@ public List<User> getAll(){
     return userRepository.findByUsername(username);
 
     }
+
+    public User updateUser(User user, String username) {
+        User old= userRepository.findByUsername(username);
+        if(old!=null){
+            old.setUsername(user.getUsername());
+            old.setPassword(user.getPassword());
+            userRepository.save(old);
+        }
+        return old;
+    }
 }
