@@ -46,33 +46,33 @@ public class JournalEntryController {
         return journalEntry ;
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId id){
+    @GetMapping("/id/{myId}")
+    public ResponseEntity<JournalEntry> getJournalEntryById(@PathVariable ObjectId myId){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
-        List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(id)).toList();
+        List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(myId)).toList();
         if(!collect.isEmpty()) {
-            JournalEntry je = journalEntryService.findById(id);
+            JournalEntry je = journalEntryService.findById(myId);
             return ResponseEntity.ok(je);
         }
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/id/{id}}")
-    public void deleteEntryById(@PathVariable ObjectId id){
+    @DeleteMapping("/id/{myId}")
+    public void deleteEntryById(@PathVariable ObjectId myId){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        journalEntryService.deleteById(id,username);
+        journalEntryService.deleteById(myId,username);
         ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/id/{id}")
-    public ResponseEntity<JournalEntry> updateEntry(@PathVariable ObjectId id , @RequestBody JournalEntry updateEntry){
+    @PutMapping("/id/{myId}")
+    public ResponseEntity<JournalEntry> updateEntry(@PathVariable ObjectId myId , @RequestBody JournalEntry updateEntry){
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(username);
-        List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(id)).toList();
+        List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(myId)).toList();
         if(!collect.isEmpty()) {
-            JournalEntry je = journalEntryService.updateEntry(id,updateEntry);
+            JournalEntry je = journalEntryService.updateEntry(myId,updateEntry);
             return ResponseEntity.ok(je);
         }
         return ResponseEntity.notFound().build();
