@@ -67,4 +67,9 @@ public List<User> getAll(){
 
     }
 
+    public User saveAdmin(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Arrays.asList("ADMIN","USER"));
+        return userRepository.save(user);
+    }
 }
