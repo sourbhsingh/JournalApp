@@ -1,33 +1,32 @@
 <configuration>
-    <appender name = "myConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-     <encoder>
-         <pattern>
-             %d{HH:mm:ss.SSS} {%thread} %-5level %logger{36} -%msg %n
-         </pattern>
-     </encoder>
-    </appender>
-    <appender name="myFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-     <file>
-         C:\Project\journalApplogs/journalApp.log
-     </file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFileNamingAndTriggeringPolicy">
-            <fileNamePattern>
-                   journalApp-%d{yy-MM-dd_HH}.%i.log
-            </fileNamePattern>
-            <maxFileSize>2MB</maxFileSize>
-            <maxHistory>5</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>
-                %d{HH:mm:ss.SSS} {%thread} %-5level %logger{36} -%msg %n
-            </pattern>
-        </encoder>
-    </appender>
 
-    <root level = "INFO">
+<!-- Console Appender -->
+<appender name="myConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+</appender>
 
-        <appender-ref ref="myConsoleAppender" />
-        <appender-ref ref="myFileAppender" />
+<!-- Rolling File Appender -->
+<appender name="myFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>C:/Project/journalApplogs/journalApp.log</file>
 
-    </root>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <!-- File name pattern for rolled logs -->
+        <fileNamePattern>C:/Project/journalApplogs/journalApp-%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+        <maxFileSize>2MB</maxFileSize>
+        <maxHistory>5</maxHistory>
+    </rollingPolicy>
+
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+</appender>
+
+<!-- Root Logger -->
+<root level="INFO">
+    <appender-ref ref="myConsoleAppender" />
+    <appender-ref ref="myFileAppender" />
+</root>
+
 </configuration>
