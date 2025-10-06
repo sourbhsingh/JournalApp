@@ -3,7 +3,6 @@ package practice.app.journalapp.entity;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -26,6 +25,8 @@ public class   User {
   @NonNull
   private String password ;
 
+  private String email;
+  private boolean sentimentAnalysis;
   private List<String> role ;
   @DBRef
   List<JournalEntry> journalEntries = new ArrayList<>();
