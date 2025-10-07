@@ -11,14 +11,17 @@ import practice.app.journalapp.entity.User;
 
 import java.util.List;
 
-@Component
+@Repository
 public class UserRepositoryImpl {
-   @Autowired
+
+    @Autowired
     MongoTemplate mongoTemplate;
 
-    List<User> findAllUserForSentimentAnalysis(){
-        Query query = Query.query(Criteria.where("email").exists(true).and("sentimentAnalysis").is(true));
-        return mongoTemplate.find(query, User.class);
+    public List<User> findAllUserForSentimentAnalysis(){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("email").regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"));
+        query.addCriteria(Criteria.where("sentimentAnalysis").is(true));
+       return mongoTemplate.find(query,User.class);
     }
 
 
