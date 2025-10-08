@@ -11,6 +11,7 @@ import practice.app.journalapp.repository.JournalEntryRepository;
 import practice.app.journalapp.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +24,24 @@ public class JournalEntryService {
     @Autowired
     private UserRepository userRepository;
 
+
+    @Transactional
+    public void saveEntry(List<JournalEntry> journalEntry, String username) {
+        try {
+            User user = userRepository.findByUsername(username);
+            List<JournalEntry> newJournalEntry= new ArrayList<>();
+            for(JournalEntry je : journalEntry){
+                je.setDate(LocalDateTime.now());
+                newJournalEntry.add(je);
+            }
+            List<JournalEntry> saved = journalEntryRepository.saveAll(newJournalEntry);
+            user.getJournalEntries().addAll(saved);
+            userRepository.save(user);
+        } catch (Exception e) {
+            logger.error("Error saving journal entry for user: {}", username, e);
+            throw e;
+        }
+    }
     @Transactional
     public void saveEntry(JournalEntry journalEntry, String username) {
         try {

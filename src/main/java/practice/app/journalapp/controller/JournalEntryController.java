@@ -39,6 +39,13 @@ public class JournalEntryController {
         return ResponseEntity.ok(e);
     }
 
+    @PostMapping("/add-all")
+    public List<JournalEntry> createMultipleEntry(@RequestBody List<JournalEntry> journalEntries){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        journalEntryService.saveEntry(journalEntries , username);
+        return journalEntries ;
+    }
+
     @PostMapping()
     public JournalEntry createEntry(@RequestBody JournalEntry journalEntry){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

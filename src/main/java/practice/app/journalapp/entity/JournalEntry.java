@@ -8,9 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
+import practice.app.journalapp.helper.Sentiment;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Document(collection = "journal_entries")
 @Data
@@ -21,5 +23,6 @@ public class JournalEntry {
     @NonNull
     private String title ;
     private String content ;
+    private Sentiment sentiment;
     private LocalDateTime date ;
 }
