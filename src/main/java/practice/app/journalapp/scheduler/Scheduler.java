@@ -30,7 +30,7 @@ public class Scheduler {
     private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 10 * * Sun")
     public void scheduleEmail(){
         log.info("Email Scheduler Started");
         List<User> userList  = userRepository.findAllUserForSentimentAnalysis();

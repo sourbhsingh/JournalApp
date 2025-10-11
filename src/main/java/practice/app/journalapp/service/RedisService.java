@@ -6,20 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Service
 public class RedisService {
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
 
-    public <T> T get( String key, Class<T> entityclass){
+    public <T> T get( String key, Class<T> entityClass){
         try {
             Object object = redisTemplate.opsForValue().get(key);
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(object.toString(), entityclass);
+            if (object == null) return null;
+            String json = object instanceof String ? (String) object : objectMapper.writeValueAsString(object);
+            return objectMapper.readValue(json, entityClass);
         } catch (Exception e) {
-            log.info("Exception occur at fetching cache",e);
+            log.error("Exception occur at fetching cache",e);
             throw new RuntimeException(e);
         }
     }
@@ -27,11 +32,10 @@ public class RedisService {
     public void set(String key , Object o , Long ttl){
         try {
 
-            ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(o);
-            redisTemplate.opsForValue().set(key,json);
+            redisTemplate.opsForValue().set(key, json, ttl, TimeUnit.MINUTES);
         } catch (Exception e) {
-            log.info("Exception occur at setting cache",e);
+            log.error("Exception occur at setting cache",e);
             throw new RuntimeException(e);
         }
     }
