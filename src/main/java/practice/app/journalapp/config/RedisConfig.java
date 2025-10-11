@@ -8,16 +8,23 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.support.RedisRepositoryFactory;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
 @Configuration
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate template (RedisConnectionFactory factory) {
-        RedisTemplate template = new RedisTemplate();
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
+
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        template.afterPropertiesSet();
         return template;
     }
 }
