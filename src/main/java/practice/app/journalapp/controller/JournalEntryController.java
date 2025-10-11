@@ -79,7 +79,7 @@ public class JournalEntryController {
         User user = userService.findByUsername(username);
         List<JournalEntry> collect = user.getJournalEntries().stream().filter(n-> n.getId().equals(myId)).toList();
         if(!collect.isEmpty()) {
-            JournalEntry je = journalEntryService.updateEntry(myId,updateEntry);
+            JournalEntry je = journalEntryService.updateEntry(myId,updateEntry,username);
             return ResponseEntity.ok(je);
         }
         return ResponseEntity.notFound().build();

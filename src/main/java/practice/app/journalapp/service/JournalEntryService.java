@@ -25,6 +25,21 @@ public class JournalEntryService {
     private UserRepository userRepository;
 
 
+    @Autowired
+    private RedisService redisService;
+
+
+    private static final Long CACHE_TTL_SECONDS = 3600L; // 1 hour
+
+    private static String journalKey(ObjectId id) {
+        return "journal:" + id.toString();
+    }
+
+    private static String userJournalsKey(String username) {
+        return "journals:user:" + username;
+    }
+
+
     @Transactional
     public void saveEntry(List<JournalEntry> journalEntry, String username) {
         try {
@@ -37,6 +52,8 @@ public class JournalEntryService {
             List<JournalEntry> saved = journalEntryRepository.saveAll(newJournalEntry);
             user.getJournalEntries().addAll(saved);
             userRepository.save(user);
+           // Invalidate user's journal Cache
+            redisService.delete(userJournalsKey(username));
         } catch (Exception e) {
             logger.error("Error saving journal entry for user: {}", username, e);
             throw e;
@@ -50,6 +67,9 @@ public class JournalEntryService {
             JournalEntry saved = journalEntryRepository.save(journalEntry);
             user.getJournalEntries().add(saved);
             userRepository.save(user);
+            // Invalidate caches
+            redisService.delete(userJournalsKey(username));
+            redisService.delete(journalKey(saved.getId()));
         } catch (Exception e) {
             logger.error("Error saving journal entry for user: {}", username, e);
             throw e;
@@ -58,16 +78,31 @@ public class JournalEntryService {
 
     public List<JournalEntry> getAll() {
         try {
-            return journalEntryRepository.findAll();
+            String key = "journals:all";
+            List<JournalEntry> cached = redisService.get(key);
+            if (cached != null) return cached;
+
+            List<JournalEntry> allEntries = journalEntryRepository.findAll();
+            redisService.set(key, allEntries, CACHE_TTL_SECONDS);
+            return allEntries;
         } catch (Exception e) {
             logger.error("Error fetching all journal entries", e);
             throw e;
         }
     }
 
+
     public JournalEntry findById(ObjectId id) {
         try {
-            return journalEntryRepository.findById(id).orElse(null);
+            String key = journalKey(id);
+            JournalEntry cached = redisService.get(key);
+            if(cached!=null)
+            {
+                return cached ;
+            }
+            JournalEntry entry = journalEntryRepository.findById(id).orElse(null);
+            if (entry != null) redisService.set(key, entry, CACHE_TTL_SECONDS);
+            return entry ;
         } catch (Exception e) {
             logger.error("Error finding journal entry by id: {}", id, e);
             throw e;
@@ -81,6 +116,9 @@ public class JournalEntryService {
             user.getJournalEntries().removeIf(n -> n.getId().equals(id));
             userRepository.save(user);
             journalEntryRepository.deleteById(id);
+            // Invalidate caches
+            redisService.delete(journalKey(id));
+            redisService.delete(userJournalsKey(username));
         } catch (Exception e) {
             logger.error("Error deleting journal entry with id: {} for user: {}", id, username, e);
             throw e;
@@ -88,13 +126,19 @@ public class JournalEntryService {
     }
 
     @Transactional
-    public JournalEntry updateEntry(ObjectId id, JournalEntry updateEntry) {
+    public JournalEntry updateEntry(ObjectId id, JournalEntry updateEntry, String username) {
         try {
             JournalEntry oldEntry = journalEntryRepository.findById(id).orElse(null);
             if (oldEntry != null) {
                 oldEntry.setTitle((updateEntry.getTitle() != null && !updateEntry.getTitle().isBlank()) ? updateEntry.getTitle() : oldEntry.getTitle());
                 oldEntry.setContent((updateEntry.getContent() != null && !updateEntry.getContent().isBlank()) ? updateEntry.getContent() : oldEntry.getContent());
                 journalEntryRepository.save(oldEntry);
+                // Invalidate caches
+
+                redisService.delete(journalKey(id));
+                redisService.delete(userJournalsKey(username));
+
+
             }
             return oldEntry;
         } catch (Exception e) {

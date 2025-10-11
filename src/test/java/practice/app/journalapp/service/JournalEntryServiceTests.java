@@ -109,7 +109,7 @@ public class JournalEntryServiceTests {
         update.setTitle("New Title");
         update.setContent("New Content");
 
-        JournalEntry result = service.updateEntry(mockEntry.getId(), update);
+        JournalEntry result = service.updateEntry(mockEntry.getId(), update,"testuser");
 
         assertEquals("New Title", result.getTitle());
         assertEquals("New Content", result.getContent());
@@ -124,7 +124,7 @@ public class JournalEntryServiceTests {
         JournalEntry update = new JournalEntry();
         update.setTitle("Doesn't matter");
 
-        JournalEntry result = service.updateEntry(randomId, update);
+        JournalEntry result = service.updateEntry(randomId, update,"testuser");
 
         assertNull(result);
         verify(journalEntryRepository, never()).save(any());
