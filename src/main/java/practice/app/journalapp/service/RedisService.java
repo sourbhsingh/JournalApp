@@ -1,6 +1,5 @@
 package practice.app.journalapp.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,33 +10,50 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class RedisService {
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
-    RedisTemplate<String,Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
-    public <T> T get( String key, Class<T> entityClass){
+    /**
+     * Get an object from Redis cache.
+     * Returns null if the key does not exist.
+     */
+    public <T> T get(String key, Class<T> entityClass) {
         try {
-            Object object = redisTemplate.opsForValue().get(key);
-            if (object == null) return null;
-            String json = object instanceof String ? (String) object : objectMapper.writeValueAsString(object);
-            return objectMapper.readValue(json, entityClass);
+            Object value = redisTemplate.opsForValue().get(key);
+            return (T) value; // safe because GenericJackson2JsonRedisSerializer handles conversion
+        } catch (ClassCastException e) {
+            log.error("Type mismatch when fetching key {} from Redis: {}", key, e.getMessage());
+            return null;
         } catch (Exception e) {
-            log.error("Exception occur at fetching cache",e);
-            throw new RuntimeException(e);
+            log.error("Error fetching key {} from Redis: {}", key, e.getMessage());
+            return null;
         }
     }
 
-    public void set(String key , Object o , Long ttl){
+    /**
+     * Set an object in Redis cache with TTL (time-to-live in seconds).
+     */
+    public void set(String key, Object value, Long ttlSeconds) {
         try {
-
-            String json = objectMapper.writeValueAsString(o);
-            redisTemplate.opsForValue().set(key, json, ttl, TimeUnit.MINUTES);
+            if (ttlSeconds != null && ttlSeconds > 0) {
+                redisTemplate.opsForValue().set(key, value, ttlSeconds, TimeUnit.SECONDS);
+            } else {
+                redisTemplate.opsForValue().set(key, value);
+            }
         } catch (Exception e) {
-            log.error("Exception occur at setting cache",e);
-            throw new RuntimeException(e);
+            log.error("Error setting key {} in Redis: {}", key, e.getMessage());
         }
     }
 
+    /**
+     * Delete a key from Redis.
+     */
+    public void delete(String key) {
+        try {
+            redisTemplate.delete(key);
+        } catch (Exception e) {
+            log.error("Error deleting key {} from Redis: {}", key, e.getMessage());
+        }
+    }
 }
