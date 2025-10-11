@@ -18,7 +18,7 @@ public class RedisService {
      * Get an object from Redis cache.
      * Returns null if the key does not exist.
      */
-    public <T> T get(String key, Class<T> entityClass) {
+    public <T> T get(String key) {
         try {
             Object value = redisTemplate.opsForValue().get(key);
             return (T) value; // safe because GenericJackson2JsonRedisSerializer handles conversion
