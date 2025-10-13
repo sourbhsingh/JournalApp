@@ -110,7 +110,6 @@ public class JournalEntryServiceTests {
         update.setContent("New Content");
 
         JournalEntry result = service.updateEntry(mockEntry.getId(), update,"testuser");
-
         assertEquals("New Title", result.getTitle());
         assertEquals("New Content", result.getContent());
         verify(journalEntryRepository, times(1)).save(mockEntry);
@@ -120,12 +119,9 @@ public class JournalEntryServiceTests {
     void testUpdateEntry_NotFound() {
         ObjectId randomId = new ObjectId();
         when(journalEntryRepository.findById(randomId)).thenReturn(Optional.empty());
-
         JournalEntry update = new JournalEntry();
         update.setTitle("Doesn't matter");
-
         JournalEntry result = service.updateEntry(randomId, update,"testuser");
-
         assertNull(result);
         verify(journalEntryRepository, never()).save(any());
     }
