@@ -21,6 +21,8 @@ public class RedisService {
     public <T> T get(String key) {
         try {
             Object value = redisTemplate.opsForValue().get(key);
+            log.info("GET:REDIS Data Loaded from Redis Successfully");
+
             return (T) value; // safe because GenericJackson2JsonRedisSerializer handles conversion
         } catch (ClassCastException e) {
             log.error("Type mismatch when fetching key {} from Redis: {}", key, e.getMessage());
@@ -41,6 +43,8 @@ public class RedisService {
             } else {
                 redisTemplate.opsForValue().set(key, value);
             }
+            log.info("SET:REDIS Data Loaded to Redis Successfully");
+
         } catch (Exception e) {
             log.error("Error setting key {} in Redis: {}", key, e.getMessage());
         }
