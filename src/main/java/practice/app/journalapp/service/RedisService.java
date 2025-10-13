@@ -1,5 +1,7 @@
 package practice.app.journalapp.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,10 +16,29 @@ public class RedisService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+
+    @Autowired
+    private ObjectMapper redisObjectMapper;
+
+    /** Get an object from Redis with type reference (safe for lists) */
+    public <T> T get(String key, TypeReference<T> typeReference) {
+        try {
+            Object value = redisTemplate.opsForValue().get(key);
+            if (value == null) return null;
+            // Convert LinkedHashMap / generic JSON into actual DTO type
+            log.info("GET:REDIS Data Loaded from Redis Successfully");
+
+            return redisObjectMapper.convertValue(value, typeReference);
+        } catch (Exception e) {
+            log.error("Error fetching key {} from Redis: {}", key, e.getMessage());
+            return null;
+        }
+    }
     /**
      * Get an object from Redis cache.
      * Returns null if the key does not exist.
      */
+
     public <T> T get(String key) {
         try {
             Object value = redisTemplate.opsForValue().get(key);

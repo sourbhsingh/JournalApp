@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import practice.app.journalapp.dto.UserDTO;
 import practice.app.journalapp.entity.User;
+import practice.app.journalapp.mappers.UserMapper;
 import practice.app.journalapp.service.UserService;
 
 @RestController
@@ -15,8 +17,8 @@ public class PublicController {
     UserService userService;
     
     @PostMapping("/create-user")
-    public ResponseEntity<?> createEntry(@RequestBody User user){
-        userService.saveEntry(user);
+    public ResponseEntity<?> createEntry(@RequestBody UserDTO user){
+          userService.saveEntry(UserMapper.toEntity(user));
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
     @GetMapping("/health-check")

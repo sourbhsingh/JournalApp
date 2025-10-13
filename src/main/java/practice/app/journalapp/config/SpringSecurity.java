@@ -29,20 +29,19 @@ public class SpringSecurity {
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        return http.authorizeHttpRequests(request -> request
-                        .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/journal/**","/user/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-
-                .httpBasic(Customizer.withDefaults())
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/public/**").permitAll()   // public endpoints first
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/journal/**", "/user/**").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .build();
-
     }
 
     @Autowired
@@ -55,3 +54,4 @@ public class SpringSecurity {
         return new BCryptPasswordEncoder();
     }
 }
+

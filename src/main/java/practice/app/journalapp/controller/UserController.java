@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import practice.app.journalapp.dto.UserDTO;
 import practice.app.journalapp.entity.User;
 import practice.app.journalapp.entity.User;
+import practice.app.journalapp.mappers.UserMapper;
 import practice.app.journalapp.service.UserService;
 
 import java.util.List;
@@ -20,10 +22,10 @@ public class UserController {
     private UserService userService ;
 
     @PutMapping()
-    public ResponseEntity<User> updateUser(@RequestBody User user){
+    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO user){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User js = userService.updateUser(user,username);
+        User js = userService.updateUser(UserMapper.toEntity(user),username);
         if(js==null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(js);
+        return ResponseEntity.ok(UserMapper.toDTO(js));
     }
 }

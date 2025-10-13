@@ -1,5 +1,6 @@
 package practice.app.journalapp.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,12 +83,17 @@ public class JournalEntryService {
         }
     }
 
+
     public List<JournalEntry> getAll() {
         try {
             String key = "journals:all";
 
-            // Check cache (DTOs)
-            List<JournalEntryDTO> cachedDTOs = redisService.get(key);
+            // Check cache with TypeReference for List<JournalEntryDTO>
+            List<JournalEntryDTO> cachedDTOs = redisService.get(
+                    key,
+                    new TypeReference<List<JournalEntryDTO>>() {}
+            );
+
             if (cachedDTOs != null) {
                 return cachedDTOs.stream()
                         .map(JournalMapper::toEntity)

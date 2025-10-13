@@ -21,11 +21,9 @@ public class RedisConfig {
     public ObjectMapper redisObjectMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .activateDefaultTyping(
-                        LaissezFaireSubTypeValidator.instance,
-                        ObjectMapper.DefaultTyping.NON_FINAL
-                );
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // Removed activateDefaultTyping completely
+        // No polymorphic type info needed for DTOs
     }
 
     @Bean
@@ -36,7 +34,7 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // Use GenericJackson2JsonRedisSerializer (modern, not deprecated)
+        // Use GenericJackson2JsonRedisSerializer (safe for DTOs, no type info issues)
         GenericJackson2JsonRedisSerializer serializer =
                 new GenericJackson2JsonRedisSerializer(redisObjectMapper);
 
