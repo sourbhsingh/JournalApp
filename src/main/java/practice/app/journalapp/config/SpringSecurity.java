@@ -42,8 +42,7 @@ public class SpringSecurity {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/public/**").permitAll()   // public endpoints first
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html","/public/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/journal/**", "/user/**").authenticated()
                         .anyRequest().authenticated()
