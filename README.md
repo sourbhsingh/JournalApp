@@ -16,3 +16,4 @@ This project uses Redis as a distributed cache integrated with Spring Boot to re
    1. Use `StringRedisSerializer` for keys and `Jackson2JsonRedisSerializer` for values.
    2. Configure sensible TTLs and monitor hit/miss rates.
    3. Mitigate cache stampede with locking or request coalescing when needed.
+5. Working: 
