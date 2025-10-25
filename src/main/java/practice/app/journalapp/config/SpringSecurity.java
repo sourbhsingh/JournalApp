@@ -45,7 +45,7 @@ public class SpringSecurity {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html","/public/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/journal/**", "/user/**").authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session ->
